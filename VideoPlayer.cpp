@@ -791,7 +791,7 @@ void VideoPlayer::playVideo (const std::string &resourceName)
   }
 
   mState->refresh = 0;
-  mState->resourceName = "mw_end.bik";
+  mState->resourceName = resourceName;
 
   schedule_refresh(mState, 40);
 
