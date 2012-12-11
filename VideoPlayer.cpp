@@ -801,7 +801,7 @@ void VideoPlayer::playVideo (const std::string &resourceName)
 
 void VideoPlayer::update ()
 {
-  if (mState->refresh)
+  if (mState && mState->refresh)
   {
     video_refresh_timer (mState);
     mState->refresh--;
