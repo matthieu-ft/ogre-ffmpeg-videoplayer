@@ -121,6 +121,8 @@ struct VideoState {
   int             quit;
 
   int refresh;
+
+  Ogre::DataStreamPtr stream;
 };
 enum {
   AV_SYNC_AUDIO_MASTER,

@@ -3,49 +3,49 @@
 
 int OgreResource_Read(void *opaque, uint8_t *buf, int buf_size)
 {
-    Ogre::DataStreamPtr stream = *((Ogre::DataStreamPtr*)opaque);
+  Ogre::DataStreamPtr stream = static_cast<VideoState*>(opaque)->stream;
 
-    int num_read = stream->size() - stream->tell();
+  int num_read = stream->size() - stream->tell();
 
-    if (num_read > buf_size)
-        num_read = buf_size;
+  if (num_read > buf_size)
+    num_read = buf_size;
 
-    stream->read(buf, num_read);
-    return num_read;
+  stream->read(buf, num_read);
+  return num_read;
 }
 
 int OgreResource_Write(void *opaque, uint8_t *buf, int buf_size)
 {
-    Ogre::DataStreamPtr stream = *((Ogre::DataStreamPtr*)opaque);
+  Ogre::DataStreamPtr stream = static_cast<VideoState*>(opaque)->stream;
 
-    int num_write = stream->size() - stream->tell();
+  int num_write = stream->size() - stream->tell();
 
-    if (num_write > buf_size)
-        num_write = buf_size;
+  if (num_write > buf_size)
+    num_write = buf_size;
 
-    stream->write (buf, num_write);
-    return num_write;
+  stream->write (buf, num_write);
+  return num_write;
 }
 
 int64_t OgreResource_Seek(void *opaque, int64_t offset, int whence)
 {
-    Ogre::DataStreamPtr stream = *((Ogre::DataStreamPtr*)opaque);
+  Ogre::DataStreamPtr stream = static_cast<VideoState*>(opaque)->stream;
 
-    switch (whence)
-    {
+  switch (whence)
+  {
     case SEEK_SET:
-        stream->seek(offset);
+      stream->seek(offset);
     case SEEK_CUR:
-        stream->seek(stream->tell() + offset);
+      stream->seek(stream->tell() + offset);
     case SEEK_END:
-        stream->seek(stream->size() + offset);
+      stream->seek(stream->size() + offset);
     case AVSEEK_SIZE:
-        return stream->size();
+      return stream->size();
     default:
-        return -1;
-    }
+      return -1;
+  }
 
-    return stream->tell();
+  return stream->tell();
 }
 
 
@@ -664,10 +664,11 @@ int decode_thread(void *arg) {
   Ogre::DataStreamPtr stream = Ogre::ResourceGroupManager::getSingleton ().openResource (is->resourceName);
   if(stream.isNull ())
     throw std::runtime_error("Failed to open video resource");
+  is->stream = stream;
 
   AVIOContext	 *ioContext = 0;
 
-  ioContext = avio_alloc_context(NULL, 0, 0, &stream, OgreResource_Read, OgreResource_Write, OgreResource_Seek);
+  ioContext = avio_alloc_context(NULL, 0, 0, is, OgreResource_Read, OgreResource_Write, OgreResource_Seek);
   if (!ioContext)
     throw std::runtime_error("Failed to allocate ioContext ");
 
@@ -805,6 +806,10 @@ void VideoPlayer::update ()
   {
     video_refresh_timer (mState);
     mState->refresh--;
+  }
+  if (mState && mState->quit)
+  {
+    close();
   }
 }
 
