@@ -447,7 +447,7 @@ int queue_picture(VideoState *is, AVFrame *pFrame, double pts) {
   // windex is set to 0 initially
   vp = &is->pictq[is->pictq_windex];
 
-  // Convert the image into YUV format that SDL uses
+  // Convert the frame to RGBA format
   if(is->sws_context == NULL) {
     int w = is->video_st->codec->width;
     int h = is->video_st->codec->height;
