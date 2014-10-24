@@ -79,6 +79,9 @@ void Application::createScene()
 	}
 	else
 		mVideoOverlay->hide();
+
+	if (mVideoPlayer->getVideoWidth() > 0 && mVideoPlayer->getVideoHeight() > 0)
+		mWindow->resize(mVideoPlayer->getVideoWidth(), mVideoPlayer->getVideoHeight());
 }
 
 void Application::destroyScene()
