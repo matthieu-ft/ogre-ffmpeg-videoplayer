@@ -143,8 +143,8 @@ struct VideoState {
     uint64_t mSeekPos;
 
     volatile bool mVideoEnded;
-    volatile bool paused;
-    volatile bool quit;
+    volatile bool mPaused;
+    volatile bool mQuit;
 };
 
 }

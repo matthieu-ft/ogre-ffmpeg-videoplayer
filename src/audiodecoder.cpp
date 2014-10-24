@@ -241,7 +241,7 @@ int MovieAudioDecoder::audio_decode_frame(AVFrame *frame, int &sample_skip)
 
 size_t MovieAudioDecoder::read(char *stream, size_t len)
 {
-    if (mVideoState->paused)
+    if (mVideoState->mPaused)
     {
         // fill the buffer with silence
         size_t sampleSize = av_get_bytes_per_sample(mOutputSampleFormat);

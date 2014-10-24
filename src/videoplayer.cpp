@@ -100,7 +100,7 @@ void VideoPlayer::pause()
 bool VideoPlayer::isPaused()
 {
     if (mState)
-        return mState->paused;
+        return mState->mPaused;
     return true;
 }
 

@@ -25,6 +25,8 @@ extern "C"
         #include <libavutil/time.h>
     #endif
 
+    #include <libavutil/mathematics.h>
+
     #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(55,28,1)
     #define av_frame_alloc  avcodec_alloc_frame
     #endif
@@ -62,7 +64,7 @@ VideoState::VideoState()
     , video_st(NULL), frame_last_pts(0.0)
     , video_clock(0.0), sws_context(NULL), rgbaFrame(NULL), pictq_size(0)
     , pictq_rindex(0), pictq_windex(0)
-    , quit(false), paused(false)
+    , mQuit(false), mPaused(false)
     , mAudioFactory(NULL)
     , mSeekRequested(false)
     , mSeekPos(0)
@@ -120,7 +122,7 @@ void PacketQueue::put(AVPacket *pkt)
 int PacketQueue::get(AVPacket *pkt, VideoState *is)
 {
     boost::unique_lock<boost::mutex> lock(this->mutex);
-    while(!is->quit)
+    while(!is->mQuit)
     {
         AVPacketList *pkt1 = this->first_pkt;
         if(pkt1)
@@ -276,10 +278,10 @@ int VideoState::queue_picture(AVFrame *pFrame, double pts)
     /* wait until we have a new pic */
     {
         boost::unique_lock<boost::mutex> lock(this->pictq_mutex);
-        while(this->pictq_size >= VIDEO_PICTURE_QUEUE_SIZE && !this->quit)
+        while(this->pictq_size >= VIDEO_PICTURE_QUEUE_SIZE && !this->mQuit)
             this->pictq_cond.timed_wait(lock, boost::posix_time::milliseconds(1));
     }
-    if(this->quit)
+    if(this->mQuit)
         return -1;
 
     this->pictq_mutex.lock();
@@ -426,7 +428,7 @@ void VideoState::decode_thread_loop(VideoState *self)
             throw std::runtime_error("No streams to decode");
 
         // main decode loop
-        while(!self->quit)
+        while(!self->mQuit)
         {
             if(self->mSeekRequested)
             {
@@ -519,7 +521,7 @@ void VideoState::decode_thread_loop(VideoState *self)
         std::cerr << "An error occured playing the video: " << e.getFullDescription () << std::endl;
     }
 
-    self->quit = true;
+    self->mQuit = true;
 }
 
 
@@ -593,7 +595,7 @@ void VideoState::init(const std::string& resourceName)
     unsigned int i;
 
     this->av_sync_type = AV_SYNC_DEFAULT;
-    this->quit = false;
+    this->mQuit = false;
 
     this->stream = Ogre::ResourceGroupManager::getSingleton().openResource(resourceName);
     if(this->stream.isNull())
@@ -681,7 +683,7 @@ void VideoState::init(const std::string& resourceName)
 
 void VideoState::deinit()
 {
-    this->quit = true;
+    this->mQuit = true;
 
     this->audioq.flush();
     this->videoq.flush();
@@ -752,7 +754,7 @@ double VideoState::get_audio_clock()
 
 void VideoState::setPaused(bool isPaused)
 {
-    this->paused = isPaused;
+    this->mPaused = isPaused;
     mExternalClock.setPaused(isPaused);
 }
 
