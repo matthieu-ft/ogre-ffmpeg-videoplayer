@@ -2,22 +2,30 @@
 
 #include <stdexcept>
 
+#include <SDL.h>
 #include <SDL_audio.h>
 
 
 class SDLMovieAudioDecoder : public Video::MovieAudioDecoder
 {
 public:
+
     virtual void adjustAudioSettings(AVSampleFormat& sampleFormat, uint64_t& channelLayout, int& sampleRate);
 
-    ~SDLMovieAudioDecoder();
     SDLMovieAudioDecoder(Video::VideoState* videoState);
+    ~SDLMovieAudioDecoder();
+
+private:
+    SDL_AudioDeviceID mDeviceId;
 };
 
 void MyAudioCallback(void*, Uint8*, int);
 
 void SDLMovieAudioDecoder::adjustAudioSettings(AVSampleFormat& sampleFormat, uint64_t& channelLayout, int& sampleRate)
 {
+    if (SDL_WasInit(SDL_INIT_AUDIO) == 0)
+        SDL_Init(SDL_INIT_AUDIO);
+
     // For simplicity, we use fixed settings here and have SDL handle resampling if necessary.
     // This is not optimal, since we might have resampling done on SDL's side *and* the audio decoder side in the worst case.
     
@@ -28,7 +36,7 @@ void SDLMovieAudioDecoder::adjustAudioSettings(AVSampleFormat& sampleFormat, uin
     sampleFormat = AV_SAMPLE_FMT_FLT;
     channelLayout = AV_CH_LAYOUT_STEREO;
 
-    SDL_AudioSpec want;
+    SDL_AudioSpec want, have;
     want.freq = sampleRate;
     want.format = AUDIO_F32;
     want.channels = 2;
@@ -36,22 +44,22 @@ void SDLMovieAudioDecoder::adjustAudioSettings(AVSampleFormat& sampleFormat, uin
     want.userdata = this;
     want.callback = MyAudioCallback;
 
-    SDL_AudioSpec have;
-
-    if (SDL_OpenAudio(&want, &have) < 0)
+    mDeviceId = SDL_OpenAudioDevice(NULL, 0, &want, &have, 0);
+    if (mDeviceId < 0)
         throw std::runtime_error(std::string("Failed to open audio: ") + SDL_GetError());
     else
-        SDL_PauseAudio(0);
-}
-
-SDLMovieAudioDecoder::~SDLMovieAudioDecoder()
-{
-    SDL_CloseAudio();
+        SDL_PauseAudioDevice(mDeviceId, 0);
 }
 
 SDLMovieAudioDecoder::SDLMovieAudioDecoder(Video::VideoState* videoState)
     : MovieAudioDecoder(videoState)
+    , mDeviceId(-1)
 {
+}
+
+SDLMovieAudioDecoder::~SDLMovieAudioDecoder()
+{
+    SDL_CloseAudioDevice(mDeviceId);
 }
 
 boost::shared_ptr<Video::MovieAudioDecoder> SDLMovieAudioFactory::createDecoder(Video::VideoState* videoState)
