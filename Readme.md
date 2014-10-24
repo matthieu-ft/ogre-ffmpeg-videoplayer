@@ -47,4 +47,9 @@ Running
 
 Place your video files in the build folder, then run the demo using a filename as argument:
 
-./ogre-ffmpeg-videoplayer-demo big_buck_bunny.avi 
+./ogre-ffmpeg-videoplayer-demo big_buck_bunny.avi
+
+Playback controls:
+ - Space: Play/Pause
+ - Left arrow/Right arrow: Seek by 5 seconds.
+ - Down arrow/Up arrow: Seek by 30 seconds.
