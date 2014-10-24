@@ -1,4 +1,4 @@
-A video player for Ogre3D using FFmpeg.
+A video player engine for Ogre3D using FFmpeg. Includes a demo application using SDL2 for audio output.
 
 License
 =======
