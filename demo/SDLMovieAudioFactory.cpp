@@ -46,7 +46,6 @@ void SDLMovieAudioDecoder::adjustAudioSettings(AVSampleFormat& sampleFormat, uin
 
 SDLMovieAudioDecoder::~SDLMovieAudioDecoder()
 {
-    std::cout << "close audio " << std::endl;
     SDL_CloseAudio();
 }
 
