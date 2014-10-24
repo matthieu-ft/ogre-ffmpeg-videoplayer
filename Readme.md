@@ -37,10 +37,12 @@ Building
 
 The demo can be built the usual cmake way:
 
+<pre>
 mkdir build
 cd build
 cmake ..
 make
+</pre>
 
 Running
 =======
@@ -51,5 +53,5 @@ Place your video files in the build folder, then run the demo using a filename a
 
 Playback controls:
  - Space: Play/Pause
- - Left arrow/Right arrow: Seek by 5 seconds.
- - Down arrow/Up arrow: Seek by 30 seconds.
+ - Left/Right: Seek by 5 seconds.
+ - Down/Up: Seek by 30 seconds.
