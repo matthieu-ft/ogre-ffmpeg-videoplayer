@@ -71,7 +71,7 @@ void MyAudioCallback(void *userdata, Uint8 *stream, int len)
         // fill the rest of the buffer with silence
         size_t sampleSize = av_get_bytes_per_sample(decoder->getOutputSampleFormat());
         Uint8* data[1];
-        data[0] = stream;
-        av_samples_set_silence((uint8_t**)stream+read, 0, (len-read)/sampleSize, 1, decoder->getOutputSampleFormat());
+        data[0] = stream+read;
+        av_samples_set_silence((uint8_t**)data, 0, (len-read)/sampleSize, 1, decoder->getOutputSampleFormat());
     }
 }
