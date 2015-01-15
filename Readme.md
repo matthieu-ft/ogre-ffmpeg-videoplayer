@@ -1,12 +1,12 @@
 A video player engine for Ogre3D using FFmpeg. Includes a demo application using SDL2 for audio output.
 
 License
-=======
+-------
 
 MIT license (see License.txt)
 
 Features
-========
+--------
 
  - Uses Ogre's resource system to open the video file, so it could be coming from an archive, or a network resource, etc.
  - Writes the video to an Ogre texture, which can be used however you want (on an overlay, or somewhere in the scene, etc)
@@ -19,7 +19,7 @@ Features
  - Fun fact: Also works with audio-only files, so you can use it as a streaming audio player, if you want.
 
 Dependencies
-============
+------------
 
 Video player engine dependencies:
 
@@ -33,7 +33,7 @@ Dependencies for the demo:
  - OIS for keyboard controls
 
 Building
-========
+--------
 
 The demo can be built the usual cmake way:
 
@@ -45,7 +45,7 @@ make
 </pre>
 
 Running
-=======
+-------
 
 Place your video files in the build folder, then run the demo using a filename as argument:
 
