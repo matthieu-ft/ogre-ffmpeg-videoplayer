@@ -1,5 +1,7 @@
     cmake_minimum_required(VERSION 2.8)
 
+option(BUILD_VIDEOPLAYER_DEMO "Build the videoplayer demo" ON)
+
 set(OGRE_FFMPEG_VIDEOPLAYER_LIBRARY "ogre-ffmpeg-videoplayer")
 
 set (CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/)
@@ -49,4 +51,6 @@ include_directories(src/)
 add_library(${OGRE_FFMPEG_VIDEOPLAYER_LIBRARY} STATIC ${OGRE_FFMPEG_VIDEOPLAYER_SOURCE_FILES})
 target_link_libraries(${OGRE_FFMPEG_VIDEOPLAYER_LIBRARY} ${VIDEO_FFMPEG_LIBRARIES} ${Boost_LIBRARIES} ${OGRE_LIBRARIES})
 
-add_subdirectory(demo)
+if(BUILD_VIDEOPLAYER_DEMO)
+    add_subdirectory(demo)
+endif()
