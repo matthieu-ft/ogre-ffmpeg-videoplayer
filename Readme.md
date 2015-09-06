@@ -1,7 +1,5 @@
 A video player engine for Ogre3D using FFmpeg. Includes a demo application using SDL2 for audio output.
 
-This project is forked to fix a compilation issue with our build system.
-
 License
 -------
 
