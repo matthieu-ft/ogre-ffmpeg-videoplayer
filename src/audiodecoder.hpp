@@ -22,9 +22,12 @@ extern "C"
 }
 
 #ifdef _WIN32
-#include <BaseTsd.h>
+#ifndef __GNUC__
 
+#include <BaseTsd.h>
 typedef SSIZE_T ssize_t;
+
+#endif
 #endif
 
 namespace Video
