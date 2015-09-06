@@ -62,7 +62,7 @@ void Application::createScene()
 	// in frameRenderingQueued, we will adjust position/size to add black bars to the side when needed
 	Ogre::OverlayManager& overlayManager = Ogre::OverlayManager::getSingleton();
 	mVideoOverlay = overlayManager.create( "VideoOverlay" );
-	mVideoPanel = static_cast<Ogre::OverlayContainer*>( overlayManager.			createOverlayElement( "Panel", "PanelName" ) );
+	mVideoPanel = static_cast<Ogre::OverlayContainer*>( overlayManager.createOverlayElement( "Panel", "PanelName" ) );
 	mVideoPanel->setPosition( 0.0, 0.0 );
 	mVideoPanel->setDimensions( 1.0, 1.0 );
 	mVideoPanel->setMaterialName( "VideoMaterial" );
