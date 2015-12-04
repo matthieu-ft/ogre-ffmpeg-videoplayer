@@ -11,7 +11,7 @@ Features
  - Uses Ogre's resource system to open the video file, so it could be coming from an archive, or a network resource, etc.
  - Writes the video to an Ogre texture, which can be used however you want (on an overlay, or somewhere in the scene, etc)
  - Complete A/V sync solution.
- - Multithreaded decoding.
+ - Threaded decoding.
  - Basic playback control support: play/pause, seeking.
  - Works with a variety of FFmpeg versions, including the Libav fork. 
  - Audio resampling support (using ffmpeg's swresample / libav's avresample library): can convert audio to the user's desired sample rate, sample format and channel layout.
