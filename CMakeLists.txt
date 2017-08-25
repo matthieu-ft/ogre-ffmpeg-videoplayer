@@ -47,9 +47,11 @@ include_directories(${Boost_INCLUDE_DIRS})
 find_package(OGRE REQUIRED)
 include_directories(${OGRE_INCLUDE_DIRS})
 
-include_directories(src/)
 
 add_library(${OGRE_FFMPEG_VIDEOPLAYER_LIBRARY} STATIC ${OGRE_FFMPEG_VIDEOPLAYER_SOURCE_FILES})
+
+target_include_directories(${OGRE_FFMPEG_VIDEOPLAYER_LIBRARY} PUBLIC src/)
+
 target_link_libraries(${OGRE_FFMPEG_VIDEOPLAYER_LIBRARY} ${VIDEO_FFMPEG_LIBRARIES} ${Boost_LIBRARIES} ${OGRE_LIBRARIES})
 
 if(BUILD_VIDEOPLAYER_DEMO)
