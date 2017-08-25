@@ -73,7 +73,7 @@ struct VideoPicture {
 };
 
 struct VideoState {
-    VideoState();
+    VideoState(int av_sync_type = AV_SYNC_DEFAULT);
     ~VideoState();
 
     void setAudioFactory(MovieAudioFactory* factory);
@@ -88,13 +88,13 @@ struct VideoState {
 
     int stream_open(int stream_index, AVFormatContext *pFormatCtx);
 
-    bool update();
+    UpdateStatus update(char* manualBufferOut = nullptr);
 
     static void video_thread_loop(VideoState *is);
     static void decode_thread_loop(VideoState *is);
 
-    void video_display(VideoPicture* vp);
-    void video_refresh();
+    void video_display(VideoPicture* vp, char *manualBufferOut);
+    bool video_refresh(char *manualBufferOut);
 
     int queue_picture(AVFrame *pFrame, double pts);
     double synchronize_video(AVFrame *src_frame, double pts);

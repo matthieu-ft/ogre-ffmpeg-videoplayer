@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include "videodefs.hpp"
 
 namespace Video
 {
@@ -30,7 +31,7 @@ namespace Video
 
         /// Play the given video. If a video is already playing, the old video is closed first.
         /// @note The video will be unpaused by default. Use the pause() and play() methods to control pausing.
-        void playVideo (const std::string& resourceName);
+        bool playVideo (const std::string& resourceName, int av_sync_type = AV_SYNC_EXTERNAL_MASTER);
 
         /// Get the current playback time position in the video, in seconds
         double getCurrentTime();
@@ -47,7 +48,7 @@ namespace Video
 
         /// This should be called every frame by the user to update the video texture.
         /// @return Returns true if the video is still playing, false if we have reached the end of the video stream.
-        bool update();
+        UpdateStatus update(char* manualBufferOut = nullptr);
 
         /// Stop the currently playing video, if a video is playing.
         void close();

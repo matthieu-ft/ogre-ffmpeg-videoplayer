@@ -23,13 +23,13 @@ void VideoPlayer::setAudioFactory(MovieAudioFactory *factory)
     mAudioFactory.reset(factory);
 }
 
-void VideoPlayer::playVideo(const std::string &resourceName)
+bool VideoPlayer::playVideo(const std::string &resourceName, int av_sync_type)
 {
     if(mState)
         close();
 
     try {
-        mState = new VideoState;
+        mState = new VideoState(av_sync_type);
         mState->setAudioFactory(mAudioFactory.get());
         mState->init(resourceName);
 
@@ -43,14 +43,17 @@ void VideoPlayer::playVideo(const std::string &resourceName)
     catch(std::exception& e) {
         std::cerr<< "Failed to play video: "<<e.what() <<std::endl;
         close();
+        return false;
     }
+
+    return true;
 }
 
-bool VideoPlayer::update ()
+UpdateStatus VideoPlayer::update (char *manualBufferOut)
 {
     if(mState)
-        return mState->update();
-    return false;
+        return mState->update(manualBufferOut);
+    return UpdateStatus_EndOfVideo;
 }
 
 std::string VideoPlayer::getTextureName()

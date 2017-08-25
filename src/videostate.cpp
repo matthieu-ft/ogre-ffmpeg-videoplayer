@@ -58,8 +58,8 @@ namespace
 namespace Video
 {
 
-VideoState::VideoState()
-    : format_ctx(NULL), av_sync_type(AV_SYNC_DEFAULT)
+VideoState::VideoState(int av_sync_type_)
+    : format_ctx(NULL), av_sync_type(av_sync_type_)
     , audio_st(NULL)
     , video_st(NULL), frame_last_pts(0.0)
     , video_clock(0.0), sws_context(NULL), rgbaFrame(NULL), pictq_size(0)
@@ -217,7 +217,7 @@ int64_t VideoState::OgreResource_Seek(void *user_data, int64_t offset, int whenc
     return stream->tell();
 }
 
-void VideoState::video_display(VideoPicture *vp)
+void VideoState::video_display(VideoPicture *vp, char* manualBufferOut)
 {
     if((*this->video_st)->codec->width != 0 && (*this->video_st)->codec->height != 0)
     {
@@ -234,21 +234,28 @@ void VideoState::video_display(VideoPicture *vp)
                                     Ogre::TU_DYNAMIC_WRITE_ONLY_DISCARDABLE);
         }
         Ogre::PixelBox pb((*this->video_st)->codec->width, (*this->video_st)->codec->height, 1, Ogre::PF_BYTE_RGBA, &vp->data[0]);
-        Ogre::HardwarePixelBufferSharedPtr buffer = mTexture->getBuffer();
-        buffer->blitFromMemory(pb);
+        if(manualBufferOut)
+        {
+            memcpy(manualBufferOut, &vp->data[0], pb.getConsecutiveSize());
+        }
+        else
+        {
+            Ogre::HardwarePixelBufferSharedPtr buffer = mTexture->getBuffer();
+            buffer->blitFromMemory(pb);
+        }
     }
 }
 
-void VideoState::video_refresh()
+bool VideoState::video_refresh(char* manualBufferOut)
 {
     boost::mutex::scoped_lock lock(this->pictq_mutex);
     if(this->pictq_size == 0)
-        return;
+        return false;
 
     if (this->av_sync_type == AV_SYNC_VIDEO_MASTER)
     {
         VideoPicture* vp = &this->pictq[this->pictq_rindex];
-        this->video_display(vp);
+        this->video_display(vp, manualBufferOut);
 
         this->pictq_rindex = (pictq_rindex+1) % VIDEO_PICTURE_QUEUE_SIZE;
         this->frame_last_pts = vp->pts;
@@ -259,7 +266,7 @@ void VideoState::video_refresh()
     {
         const float threshold = 0.03f;
         if (this->pictq[pictq_rindex].pts > this->get_master_clock() + threshold)
-            return; // not ready yet to show this picture
+            return false; // not ready yet to show this picture
 
         // TODO: the conversion to RGBA is done in the decoding thread, so if a picture is skipped here, then it was
         // unnecessarily converted. But we may want to replace the conversion by a pixel shader anyway (see comment in queue_picture)
@@ -275,7 +282,7 @@ void VideoState::video_refresh()
         assert (this->pictq_rindex < VIDEO_PICTURE_QUEUE_SIZE);
         VideoPicture* vp = &this->pictq[this->pictq_rindex];
 
-        this->video_display(vp);
+        this->video_display(vp,manualBufferOut);
 
         this->frame_last_pts = vp->pts;
 
@@ -285,6 +292,8 @@ void VideoState::video_refresh()
         this->pictq_rindex = (this->pictq_rindex+1) % VIDEO_PICTURE_QUEUE_SIZE;
         this->pictq_cond.notify_one();
     }
+
+    return true;
 }
 
 
@@ -542,10 +551,13 @@ void VideoState::decode_thread_loop(VideoState *self)
 }
 
 
-bool VideoState::update()
+UpdateStatus VideoState::update(char *manualBufferOut)
 {
-    this->video_refresh();
-    return !this->mVideoEnded;
+    bool result = this->video_refresh(manualBufferOut);
+    if(this->mVideoEnded)
+        return UpdateStatus_EndOfVideo;
+
+    return result? UpdateStatus_NewFrame : UpdateStatus_OldFrame;
 }
 
 

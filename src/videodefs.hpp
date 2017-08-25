@@ -12,6 +12,12 @@ enum {
     AV_SYNC_DEFAULT = AV_SYNC_EXTERNAL_MASTER
 };
 
+enum UpdateStatus {
+    UpdateStatus_EndOfVideo,
+    UpdateStatus_OldFrame,
+    UpdateStatus_NewFrame
+};
+
 }
 
 #endif
