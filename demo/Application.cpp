@@ -10,6 +10,9 @@
 #include <OgreMaterial.h>
 #include <OgrePass.h>
 #include <OgreTextureUnitState.h>
+#include <OgreTechnique.h>
+#include <OgreOverlayContainer.h>
+#include <OgreOverlay.h>
 
 #include <Overlay/OgreOverlaySystem.h>
 #include <Overlay/OgreOverlayManager.h>
